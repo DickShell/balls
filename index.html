@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Мяч</title>
+	<style>
+		#div {
+			width: 200px;
+			height: 200px;
+			border: 3px solid red;
+		}
+		.button {
+			width: 207px;
+			height: 30px;
+			margin: 5px 0;
+			border: 1px solid blue;
+			border-radius: 5px; 
+			outline: none;
+		}
+	</style>
+</head>
+<body>
+	<div id="div">
+		<canvas id="canvas" width="200" height="200"></canvas>
+	</div>
+	<button class="button_1 button">Запуск</button>
+	<script>
+		var Ball = function(x, y, xSpeed, ySpeed) {
+			this.x = x;
+			this.y = y;
+			this.xSpeed = xSpeed;
+			this.ySpeed = ySpeed;
+		};
+
+		var circle = function(x, y, radius, fillCircle, color) {
+			ctx.beginPath();
+			ctx.arc(x, y, radius, 0, Math.PI * 2, false);
+			this.color = color;
+			ctx.fillStyle = this.color;
+			ctx.fill();
+		};
+
+		Ball.prototype.draw = function(color) {
+			circle(this.x, this.y, 10, true, color);
+		};
+		Ball.prototype.move = function() {
+			this.x += this.xSpeed;
+			this.y += this.ySpeed;
+		};
+		Ball.prototype.checkCollision = function() {
+			if(this.x < 10 || this.x > 190) {
+				this.xSpeed = -this.xSpeed;
+			}
+			if(this.y < 10 || this.y > 190) {
+				this.ySpeed = -this.ySpeed;
+			}
+		};
+		var canvas = document.getElementById("canvas");
+		var ctx = canvas.getContext("2d");
+		var button_1 = document.querySelector(".button_1");
+		
+		var ball_1 = new Ball(40, 170, 1, -2);
+		var ball_2 = new Ball(170, 40, -1, 3);
+		var ball_3 = new Ball(50, 50, 2, 3);
+
+		ball_1.draw("red");
+		ball_2.draw("green");
+		ball_3.draw("blue");
+		
+		button_1.addEventListener('click', start);
+		var id;
+		function start() {
+			id = setInterval(function() {
+				ctx.clearRect(0, 0, 200, 200);
+				ball_1.draw("red");
+				ball_1.move();
+				ball_1.checkCollision();
+				
+				ball_2.draw("green");
+				ball_2.move();
+				ball_2.checkCollision();
+
+				ball_3.draw("blue");
+				ball_3.move();
+				ball_3.checkCollision();
+
+				var diffX_1 = ball_1.x - ball_2.x;
+				var diffY_1 = ball_1.y - ball_2.y;
+				var getDistanse_1 = Math.sqrt((diffX_1 * diffX_1) + (diffY_1 * diffY_1));
+
+				var diffX_2 = ball_1.x - ball_3.x;
+				var diffY_2 = ball_1.y - ball_3.y;
+				var getDistanse_2 = Math.sqrt((diffX_2 * diffX_2) + (diffY_2 * diffY_2));
+
+				var diffX_3 = ball_3.x - ball_2.x;
+				var diffY_3 = ball_3.y - ball_2.y;
+				var getDistanse_3 = Math.sqrt((diffX_3 * diffX_3) + (diffY_3 * diffY_3));
+
+				if(getDistanse_1 <= 20) {
+					ball_1.xSpeed = -ball_1.xSpeed;
+					ball_2.xSpeed = -ball_2.xSpeed;
+					ball_1.ySpeed = -ball_1.ySpeed;
+					ball_2.ySpeed = -ball_2.ySpeed;
+				}
+				if(getDistanse_2 <= 20) {
+					ball_1.xSpeed = -ball_1.xSpeed;
+					ball_3.xSpeed = -ball_3.xSpeed;
+					ball_1.ySpeed = -ball_1.ySpeed;
+					ball_3.ySpeed = -ball_3.ySpeed;
+				}
+				if(getDistanse_3 <= 20) {
+					ball_2.xSpeed = -ball_2.xSpeed;
+					ball_3.xSpeed = -ball_3.xSpeed;
+					ball_2.ySpeed = -ball_2.ySpeed;
+					ball_3.ySpeed = -ball_3.ySpeed;
+				}
+			}, 15);
+			this.removeEventListener('click', start);
+			this.addEventListener('click', stop);
+			this.innerHTML = "Остановка";
+		};
+
+		function stop() {
+			clearInterval(id);
+			this.removeEventListener('click', stop);
+			this.addEventListener('click', start);
+			this.innerHTML = "Запуск";
+		};		
+	</script>
+</body>
+</html>
